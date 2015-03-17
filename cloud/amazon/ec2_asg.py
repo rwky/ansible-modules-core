@@ -506,7 +506,7 @@ def replace(connection, module):
     as_group.desired_capacity = desired_capacity + batch_size
     as_group.update()
     wait_for_new_instances(module, connection, group_name, wait_timeout, as_group.min_size, 'viable_instances')
-    wait_for_elb(connection, module, as_group)
+    wait_for_elb(connection, module, group_name)
     as_group = connection.get_all_groups(names=[group_name])[0]
     props = get_properties(as_group)
     instances = props['instances']
@@ -581,8 +581,7 @@ def wait_for_new_instances(module, connection, group_name, wait_timeout, desired
     wait_timeout = time.time() + wait_timeout
     while wait_timeout > time.time() and desired_size > props[prop]:
         time.sleep(10)
-        as_groups = connection.get_all_groups(names=[group_name])
-        as_group = as_groups[0]
+        as_group = connection.get_all_groups(names=[group_name])[0]
         props = get_properties(as_group)
     if wait_timeout <= time.time():
         # waiting took too long
